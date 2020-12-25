@@ -1,8 +1,10 @@
 from ctypes import *
+import random
+
 from dotenv import load_dotenv
 import os
 import requests
-from configparser import ConfigParser 
+from configparser import ConfigParser
 
 configuration= ConfigParser()
 configuration.read('settings.ini')
@@ -17,8 +19,9 @@ MAX_WALLPAPER_COUNT = int(configuration.get('DEFAULT', 'max_wallpaper_count'))
 API_URL = f"https://api.unsplash.com/photos/?client_id={ACCESS_KEY}"
 
 def add_new_wallpaper():
-    rand_photo = requests.get(f"https://api.unsplash.com/photos/random?client_id={ACCESS_KEY}&query=nature&orientation=landscape&featured").json()
-    photo = rand_photo["links"]["download"]
+    rand_photo = requests.get(f"https://api.unsplash.com/topics/wallpapers/photos?client_id={ACCESS_KEY}&query=nature&orientation=landscape&order_by=featured").json()
+    random_index = random.randint(0, len(rand_photo) - 1)
+    photo = rand_photo[random_index]["links"]["download"]
     
     with open(os.path.join(BASE_PATH, WALLPAPER_NAME), "wb") as f:
         f.write(requests.get(photo, stream=True).content)
